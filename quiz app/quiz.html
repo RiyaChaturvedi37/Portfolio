@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quiz App (50 Questions)</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .quiz-container {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+      width: 90%;
+      max-width: 600px;
+      backdrop-filter: blur(10px);
+    }
+
+    h2 { margin-bottom: 20px; }
+
+    .option {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .option:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    #nextBtn, #restartBtn {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      background-color: #00d2ff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      display: none;
+    }
+
+    #nextBtn:hover, #restartBtn:hover {
+      background-color: #1fa2ff;
+    }
+
+    #score { text-align: center; margin-top: 15px; }
+
+    .summary { display: none; text-align: center; }
+
+    .summary ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .summary li {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 5px;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+
+<div class="quiz-container" id="quizContainer">
+  <h2 id="question">Loading...</h2>
+  <div id="options"></div>
+  <button id="nextBtn" onclick="nextQuestion()">Next</button>
+  <div id="score"></div>
+
+  <div class="summary" id="summary">
+    <h2>Quiz Completed!</h2>
+    <p id="finalScore"></p>
+    <ul id="reviewList"></ul>
+    <button id="restartBtn" onclick="restartQuiz()">Restart Quiz</button>
+  </div>
+</div>
+
+<script>
+  const quizData = [
+    // === Sample Questions (add more below) ===
+    { question: "What is 2 + 2?", options: ["3", "4", "5", "6"], answer: "4" },
+    { question: "What is the capital of Japan?", options: ["Tokyo", "Beijing", "Seoul", "Bangkok"], answer: "Tokyo" },
+    { question: "What is the boiling point of water?", options: ["50°C", "100°C", "150°C", "200°C"], answer: "100°C" },
+    { question: "Which planet is known as the Red Planet?", options: ["Earth", "Venus", "Mars", "Jupiter"], answer: "Mars" },
+    { question: "HTML stands for?", options: ["Hyper Tool Markup Language", "HyperText Markup Language", "HighText Machine Language", "None"], answer: "HyperText Markup Language" },
+    { question: "Who wrote 'Romeo and Juliet'?", options: ["Dickens", "Shakespeare", "Hemingway", "Twain"], answer: "Shakespeare" },
+    { question: "Largest mammal?", options: ["Elephant", "Blue Whale", "Shark", "Giraffe"], answer: "Blue Whale" },
+    { question: "Which gas do plants use?", options: ["Oxygen", "Carbon Dioxide", "Nitrogen", "Hydrogen"], answer: "Carbon Dioxide" },
+    { question: "JavaScript runs on the:", options: ["Server", "Browser", "Compiler", "Chip"], answer: "Browser" },
+    { question: "CSS is used for:", options: ["Calculations", "Styling", "Security", "Databases"], answer: "Styling" },
+
+    // === Add more questions here up to 50 ===
+  ];
+
+  let currentQuestion = 0;
+  let score = 0;
+  let userAnswers = [];
+
+  function loadQuestion() {
+    const q = quizData[currentQuestion];
+    document.getElementById("question").textContent = q.question;
+    const optionsContainer = document.getElementById("options");
+    optionsContainer.innerHTML = "";
+
+    q.options.forEach(opt => {
+      const div = document.createElement("div");
+      div.className = "option";
+      div.textContent = opt;
+      div.onclick = () => selectOption(div, q.answer);
+      optionsContainer.appendChild(div);
+    });
+
+    document.getElementById("nextBtn").style.display = "none";
+    document.getElementById("score").textContent = `Question ${currentQuestion + 1} of ${quizData.length}`;
+  }
+
+  function selectOption(selected, correctAnswer) {
+    const options = document.querySelectorAll(".option");
+    options.forEach(opt => opt.style.pointerEvents = "none");
+
+    const userAnswer = selected.textContent;
+    const isCorrect = userAnswer === correctAnswer;
+
+    if (isCorrect) {
+      selected.style.backgroundColor = "#28a745";
+      score++;
+    } else {
+      selected.style.backgroundColor = "#dc3545";
+      options.forEach(opt => {
+        if (opt.textContent === correctAnswer) {
+          opt.style.backgroundColor = "#28a745";
+        }
+      });
+    }
+
+    userAnswers.push({ question: quizData[currentQuestion].question, answer: userAnswer, correct: correctAnswer });
+
+    document.getElementById("nextBtn").style.display = "block";
+  }
+
+  function nextQuestion() {
+    currentQuestion++;
+    if (currentQuestion < quizData.length) {
+      loadQuestion();
+    } else {
+      showSummary();
+    }
+  }
+
+  function showSummary() {
+    document.getElementById("question").style.display = "none";
+    document.getElementById("options").style.display = "none";
+    document.getElementById("nextBtn").style.display = "none";
+    document.getElementById("score").style.display = "none";
+
+    const summary = document.getElementById("summary");
+    const finalScore = document.getElementById("finalScore");
+    const reviewList = document.getElementById("reviewList");
+
+    finalScore.textContent = `You scored ${score} out of ${quizData.length}`;
+    reviewList.innerHTML = "";
+
+    userAnswers.forEach((entry, index) => {
+      const li = document.createElement("li");
+      li.innerHTML = `<strong>Q${index + 1}:</strong> ${entry.question}<br>
+                      <strong>Your Answer:</strong> ${entry.answer}<br>
+                      <strong>Correct Answer:</strong> ${entry.correct}`;
+      reviewList.appendChild(li);
+    });
+
+    summary.style.display = "block";
+    document.getElementById("restartBtn").style.display = "block";
+  }
+
+  function restartQuiz() {
+    currentQuestion = 0;
+    score = 0;
+    userAnswers = [];
+
+    document.getElementById("summary").style.display = "none";
+    document.getElementById("question").style.display = "block";
+    document.getElementById("options").style.display = "block";
+    document.getElementById("score").style.display = "block";
+
+    loadQuestion();
+  }
+
+  loadQuestion();
+</script>
+</body>
+</html>

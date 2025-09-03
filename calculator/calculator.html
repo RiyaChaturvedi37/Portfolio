@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Stylish Calculator</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #ff758c, #ff7eb3);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .calculator {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+      width: 300px;
+    }
+
+    .display {
+      width: 100%;
+      height: 60px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      text-align: right;
+      padding: 10px;
+      font-size: 24px;
+      color: white;
+      overflow: auto;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 20px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      background-color: rgba(255, 255, 255, 0.3);
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .equal {
+      grid-column: span 2;
+      background-color: #28a745;
+    }
+
+    .equal:hover {
+      background-color: #218838;
+    }
+
+    .clear {
+      background-color: #dc3545;
+    }
+
+    .clear:hover {
+      background-color: #c82333;
+    }
+  </style>
+</head>
+<body>
+
+<div class="calculator">
+  <div class="display" id="display">0</div>
+  <div class="buttons">
+    <button onclick="clearDisplay()" class="clear">C</button>
+    <button onclick="append('/')">/</button>
+    <button onclick="append('*')">*</button>
+    <button onclick="append('-')">-</button>
+    
+    <button onclick="append('7')">7</button>
+    <button onclick="append('8')">8</button>
+    <button onclick="append('9')">9</button>
+    <button onclick="append('+')">+</button>
+    
+    <button onclick="append('4')">4</button>
+    <button onclick="append('5')">5</button>
+    <button onclick="append('6')">6</button>
+    <button onclick="append('.')">.</button>
+    
+    <button onclick="append('1')">1</button>
+    <button onclick="append('2')">2</button>
+    <button onclick="append('3')">3</button>
+    <button onclick="calculate()" class="equal">=</button>
+    
+    <button onclick="append('0')" style="grid-column: span 4;">0</button>
+  </div>
+</div>
+
+<script>
+  const display = document.getElementById('display');
+
+  function append(value) {
+    if (display.textContent === '0' || display.textContent === 'Error') {
+      display.textContent = value;
+    } else {
+      display.textContent += value;
+    }
+  }
+
+  function clearDisplay() {
+    display.textContent = '0';
+  }
+
+  function calculate() {
+    try {
+      display.textContent = eval(display.textContent);
+    } catch {
+      display.textContent = 'Error';
+    }
+  }
+
+  // Optional: support keyboard input
+  document.addEventListener('keydown', function(e) {
+    const key = e.key;
+    if (!isNaN(key) || "+-*/.".includes(key)) {
+      append(key);
+    } else if (key === "Enter") {
+      calculate();
+    } else if (key === "Backspace") {
+      display.textContent = display.textContent.slice(0, -1) || "0";
+    } else if (key.toLowerCase() === 'c') {
+      clearDisplay();
+    }
+  });
+</script>
+
+</body>
+</html>
